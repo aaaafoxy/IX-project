@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="<%= current_language %>">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<title><%= html_title %></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="<%= Redmine::Info.app_name %>" />
+<meta name="keywords" content="issue,bug,tracker" />
+<%= csrf_meta_tag %>
+<%= favicon %>
+<%= stylesheet_link_tag 'jquery/jquery-ui-1.13.2', 'tribute-5.1.3', 'application', 'responsive', :media => 'all' %>
+<%= stylesheet_link_tag 'rtl', :media => 'all' if l(:direction) == 'rtl' %>
+<%= javascript_heads %>
+<%= heads_for_theme %>
+<%= heads_for_auto_complete(@project) %>
+<%= call_hook :view_layouts_base_html_head %>
+<!-- page specific tags -->
+<%= yield :header_tags -%>
+</head>
+<body class="<%= body_css_classes %>">
+<%= call_hook :view_layouts_base_body_top %>
+<div id="wrapper">
+
+<div class="flyout-menu js-flyout-menu">
+
+    <% if User.current.logged? || !Setting.login_required? %>
+        <div class="flyout-menu__search">
+            <%= form_tag(search_path(id: @project), :method => :get ) do %>
+            <%= hidden_field_tag(controller.default_search_scope, 1, :id => nil) if controller.default_search_scope %>
+            <%= label_tag 'flyout-search', '&#9906;'.html_safe, :class => 'search-magnifier search-magnifier--flyout' %>
+            <%= text_field_tag 'q', @question, :id => 'flyout-search', :class => 'small js-search-input', :placeholder => l(:label_search) %>
+            <% end %>
+        </div>
+    <% end %>
+
+    <% if User.current.logged? %>
+        <div class="flyout-menu__avatar <% if !Setting.gravatar_enabled? %>flyout-menu__avatar--no-avatar<% end %>">
+            <% if Setting.gravatar_enabled? %>
+                <%= link_to(avatar(User.current, :size => "80"), user_path(User.current)) %>
+            <% end %>
+            <%= link_to_user(User.current, :format => :username) %>
+        </div>
+    <% end %>
+
+    <% if display_main_menu?(@project) %>
+        <h3><%= l(:label_project) %></h3>
+        <span class="js-project-menu"></span>
+    <% end %>
+
+    <h3><%= l(:label_general) %></h3>
+    <span class="js-general-menu"></span>
+
+    <span class="js-sidebar flyout-menu__sidebar"></span>
+
+    <h3><%= l(:label_profile) %></h3>
+    <span class="js-profile-menu"></span>
+
+</div>
+
+
+<div id="top-menu">
+    <div id="account">
+        <%= render_menu :account_menu -%>
+    </div>
+    <%= content_tag('div', "#{l(:label_logged_as)} #{link_to_user(User.current, :format => :username)}".html_safe, :id => 'loggedas') if User.current.logged? %>
+    <%= render_menu :top_menu if User.current.logged? || !Setting.login_required? -%>
+</div>
+
+<% is_worklog_tab = (controller.controller_name == 'worklogs' && ['new', 'history', 'create'].include?(controller.action_name)) %>
+
+<div id="header" style="position:relative;">
+  <a href="#" class="mobile-toggle-button js-flyout-menu-toggle-button"></a>
+  <div style="padding: 0 0 0 0; display:flex; align-items:center;">
+    <h1 style="margin-left: 6px; display:inline-block; vertical-align:middle; font-size:28px;">IX项目管理系统</h1>
+    <% if @project && @project.id.present? %>
+    <div class="current-project-name" style="margin-left:28px; font-size:20px; font-weight:bold; color:#1976d2; background:rgba(255,255,255,0.85); padding:2px 16px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:inline-block; vertical-align:middle;">
+      <%= link_to @project.name, project_path(@project), style: "color:#1976d2; text-decoration:none;" %>
+    </div>
+  <% end %>
+  </div>
+
+  <% if is_worklog_tab %>
+    <div id="main-menu" class="tabs">
+      <ul>
+        <li><a href="<%= new_worklog_path %>" class="<%= controller.action_name == 'new' ? 'selected' : '' %>">每日填报</a></li>
+        <li><a href="<%= history_worklogs_path %>" class="<%= controller.action_name == 'history' ? 'selected' : '' %>">填报历史</a></li>
+      </ul>
+    </div>
+  <% elsif display_main_menu?(@project) %>
+    <div id="main-menu" class="tabs">
+        <%= render_main_menu(@project) %>
+        <div class="tabs-buttons" style="display:none;">
+            <button class="tab-left" onclick="moveTabLeft(this); return false;"></button>
+            <button class="tab-right" onclick="moveTabRight(this); return false;"></button>
+        </div>
+    </div>
+  <% end %>
+</div>
+
+
+<div id="main" class="<%= sidebar_content? ? '' : 'nosidebar' %>">
+    <div id="sidebar">
+        <%= yield :sidebar %>
+        <%= view_layouts_base_sidebar_hook_response %>
+    </div>
+
+    <div id="content">
+        <%= render_flash_messages %>
+        <%= yield %>
+        <%= call_hook :view_layouts_base_content %>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+<div id="footer">
+    Powered by <%= link_to Redmine::Info.app_name, Redmine::Info.url %> &copy; 2006-2025 Jean-Philippe Lang
+</div>
+
+<div id="ajax-indicator" style="display:none;"><span><%= l(:label_loading) %></span></div>
+<div id="ajax-modal" style="display:none;"></div>
+
+</div>
+<%= call_hook :view_layouts_base_body_bottom %>
+</body>
+</html>

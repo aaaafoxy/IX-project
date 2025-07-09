@@ -1,0 +1,148 @@
+<style>
+.worklog-form-table {
+  width: 480px;
+  margin: 0 auto 30px auto;
+  font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 16px;
+}
+.worklog-form-table th {
+  text-align: right;
+  padding: 8px 12px 8px 0;
+  vertical-align: middle;
+  font-weight: normal;
+  color: #333;
+  width: 120px;
+}
+.worklog-form-table td {
+  padding: 8px 0 8px 0;
+}
+.worklog-form-table input[type="text"],
+.worklog-form-table input[type="number"],
+.worklog-form-table input[type="date"],
+.worklog-form-table select {
+  width: 220px;
+  height: 34px;
+  padding: 6px 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.worklog-form-table input[type="date"] {
+  width: 150px;
+}
+.worklog-form-table .required-star {
+  color: #d00;
+  margin-right: 2px;
+  font-weight: bold;
+}
+.worklog-form-table textarea {
+  width: 220px;
+  height: 32px;
+  padding: 6px 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-size: 15px;
+}
+.worklog-form-table .submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 14px 32px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+.worklog-form-table .submit-btn:hover {
+  background: #1256a2;
+}
+.worklog-form .form-inputs select,
+.worklog-form .form-inputs input[type="text"],
+.worklog-form .form-inputs input[type="date"] {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+</style>
+
+<div class="worklog-form">
+  <h2 style="font-size: 2em; font-weight: bold; margin-bottom: 24px; text-align: center; letter-spacing: 2px;">工时填报</h2>
+  <%= form_with model: @worklog, url: worklogs_path, local: true do |f| %>
+    <table class="worklog-form-table">
+      <tr>
+        <th><span class="required-star">*</span>日期</th>
+        <td><%= f.date_field :date, value: @worklog.date || Date.today %></td>
+      </tr>
+      <tr>
+        <th><span class="required-star">*</span>项目</th>
+        <td><%= f.collection_select :project_id, Project.all, :id, :name, {prompt: '请选择项目'}, {id: 'worklog_project_id'} %></td>
+      </tr>
+      <tr>
+        <th>关联问题</th>
+        <td><%= f.collection_select :issue_id, Issue.where(project_id: @worklog.project_id), :id, :subject, {prompt: '可选'}, {id: 'worklog_issue_id'} %></td>
+      </tr>
+      <tr>
+        <th><span class="required-star">*</span>工时（小时）</th>
+        <td><%= f.number_field :hours, min: 0, max: 24, step: 0.1 %></td>
+      </tr>
+      <tr>
+        <th><span class="required-star">*</span>活动类型</th>
+        <td><%= f.collection_select :activity_id, TimeEntryActivity.all, :id, :name, prompt: '请选择活动类型' %></td>
+      </tr>
+      <tr>
+        <th>备注</th>
+        <td><%= f.text_field :remark %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <% if @worklog.errors.any? %>
+            <div class="errorExplanation">
+              <h4 style="color:#d00;">请修正以下错误：</h4>
+              <ul style="list-style:none; padding-left:0;">
+                <% @worklog.errors.full_messages.each do |msg| %>
+                  <li style="color:#d00;"><span style="color:#d00;font-weight:bold;">*</span> <%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><%= f.button '提交', class: 'submit-btn' %></td>
+      </tr>
+    </table>
+  <% end %>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var projectSelect = document.getElementById('worklog_project_id');
+    var issueSelect = document.getElementById('worklog_issue_id');
+    projectSelect.addEventListener('change', function() {
+      var projectId = this.value;
+      issueSelect.innerHTML = '<option value="">加载中...</option>';
+      fetch('/worklogs/issues_by_project?project_id=' + projectId)
+        .then(response => response.json())
+        .then(data => {
+          let options = '<option value="">可选</option>';
+          data.forEach(function(issue) {
+            options += `<option value="${issue.id}">${issue.subject}</option>`;
+          });
+          issueSelect.innerHTML = options;
+        });
+    });
+  });
+</script> 

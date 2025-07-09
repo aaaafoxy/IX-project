@@ -1,0 +1,74 @@
+<% html_title(l(:label_work_log_report)) %>
+
+<div class="contextual">
+  <%# Will be used for buttons later %>
+</div>
+
+<h2><%= l(:label_work_log_report) %></h2>
+
+<%= form_tag(admin_worklogs_path, method: :get, id: 'query_form') do %>
+<fieldset id="filters" class="collapsible">
+  <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+  <div style="<%= 'display: none;' if !params[:set_filter] %>">
+    <table>
+      <tr>
+        <td style="width: 100px;"><label for="user_id"><%= l(:field_user) %></label></td>
+        <td><%= select_tag 'user_id', users_for_select(@users, params[:user_id]), include_blank: true, style: "width: 250px;" %></td>
+      </tr>
+      <tr>
+        <td><label for="project_id"><%= l(:field_project) %></label></td>
+        <td><%= select_tag 'project_id', projects_for_select(@projects, params[:project_id]), include_blank: true, style: "width: 250px;" %></td>
+      </tr>
+      <tr>
+        <td><label for="from_date"><%= l(:field_from_date) %></label></td>
+        <td><%= text_field_tag 'from_date', params[:from_date], size: 10 %><%= calendar_for('from_date') %></td>
+      </tr>
+      <tr>
+        <td><label for="to_date"><%= l(:field_to_date) %></label></td>
+        <td><%= text_field_tag 'to_date', params[:to_date], size: 10 %><%= calendar_for('to_date') %></td>
+      </tr>
+    </table>
+    <p class="buttons">
+      <%= link_to_function l(:button_apply), "$('#query_form').submit()", class: 'icon icon-checked' %>
+      <%= link_to l(:button_clear), admin_worklogs_path, class: 'icon icon-reload' %>
+    </p>
+  </div>
+</fieldset>
+<% end %>
+
+<div class="total-info">
+  <h3><%= l(:label_total_time) %>: <%= number_with_precision(@total_hours, precision: 2) %> <%= l(:label_hour_plural) %></h3>
+</div>
+
+<div class="autoscroll">
+  <table class="list time-entries">
+    <thead>
+      <tr>
+        <th><%= l(:field_user) %></th>
+        <th><%= l(:field_project) %></th>
+        <th><%= l(:field_date) %></th>
+        <th><%= l(:field_hours) %></th>
+        <th><%= l(:field_activity) %></th>
+        <th><%= l(:field_issue) %></th>
+        <th><%= l(:field_comments) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @worklogs.each do |worklog| %>
+        <tr class="worklog-row">
+          <td><%= link_to_user worklog.user %></td>
+          <td><%= link_to_project worklog.project %></td>
+          <td><%= format_date(worklog.date) %></td>
+          <td><%= worklog.hours %></td>
+          <td><%= worklog.activity.name if worklog.activity %></td>
+          <td><%= worklog.issue ? link_to(worklog.issue.subject, issue_path(worklog.issue)) : '' %></td>
+          <td><%= worklog.remark %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<p class="pagination">
+  <%= pagination_links_full @worklog_pages, @worklog_count %>
+</p>

@@ -1,0 +1,95 @@
+---
+alwaysApply: true
+---
+# .cursorrules - 全能工程师模式配置文件（完整版）
+name: "ProActive Engineer"
+description: "全栈式AI编程助手：主动完成架构设计、智能编码、测试驱动、质量看护全流程，提升200%开发效率"
+auto_apply: true  # 关键设置：确保规则自动应用
+triggers:
+  - on_file_open: true  # 打开任何文件时激活
+  - on_keypress: "Ctrl+Alt+E"  # 自定义热键激活工程模式
+
+# ================= 四大核心模块 =================
+rule_sets:
+  - name: "架构设计助理"
+    pattern: ["*.py", "*.js", "*.go", "*.java", "*.ts"]
+    actions:
+      on_create: >
+        检测到新文件创建，提供以下架构选项:
+        1. MVC分层架构 [适用Web应用]
+        2. 微服务架构 [适用分布式系统]
+        3. 事件驱动架构 [适用实时处理]
+        4. Serverless架构 [适用无服务器场景]
+      on_keyword: "#ARCH"
+        response: >
+          正在生成架构决策文档（ADR），包含：
+          - 架构图（PlantUML）
+          - 组件交互时序
+          - 扩容方案设计
+
+  - name: "智能编码加速器"
+    pattern: ["*"]
+    actions:
+      hotkeys:
+        "Ctrl+Alt+G": "生成符合当前上下文的函数（自动推导类型+异常处理）"
+        "Ctrl+Alt+T": "为当前代码块生成测试用例（自动推断边界条件）"
+        "Ctrl+Alt+D": "生成API文档（符合OpenAPI规范）"
+      autocomplete:
+        template_suggestions: true  # 自动识别场景推送模板
+        context_aware: true  # 基于项目上下文优化代码
+
+  - name: "测试驱动专家"
+    pattern: ["*_test.*", "test_*.*", "spec.*"]
+    actions:
+      auto_generate:
+        on_save: true  # 文件保存时同步测试
+        frameworks:
+          python: pytest
+          javascript: vitest
+          typescript: jest
+          go: testing
+      coverage_policy:
+        min: 85
+        enforce: true  # 覆盖率不足时阻止提交
+
+  - name: "质量看守护卫"
+    pattern: ["*"]
+    security_rules:
+      - name: "空指针防护"
+        pattern: ".*\\..*\\[.*\\]"
+        response: "⚠️ 高危操作：建议使用安全访问操作符?.或空值合并??"
+      - name: "资源泄露防御"
+        pattern: "(open|connect|exec)\\("
+        response: "🔒 安全警告：使用with/resource自动释放资源"
+      - name: "SQL注入防护"
+        pattern: "execute\\(.*\\+.*\\)"
+        response: "🚫 高危SQL操作：使用参数化查询防止注入"
+    security_frameworks: ["OWASP-Top10", "CWE-25"]
+
+# ================= 智能优化引擎 =================
+optimization_modules:
+  - name: "性能探针"
+    action: auto_analysis
+    metrics:
+      time_complexity: true
+      space_complexity: true
+      memory_leak: true
+
+  - name: "SQL优化器"
+    action: auto_detect
+    features:
+      n1_problem: true
+      index_suggestion: true
+
+# ================= 知识库集成 =================
+knowledge_integration:
+  project_docs: ["./docs/", "ARCH.md", "API_GUIDE.md"]  # 学习项目文档
+  external_knowledge: 
+    - "https://cheatsheetseries.owasp.org/"
+    - "https://refactoring.guru/"
+
+# ================= 用户偏好设置 =================
+preferences:
+  language: zh-CN  # 使用中文交互
+  verbosity: detailed  # 详细解释技术决策
+  review_mode: proactive  # 主动提交优化建议
