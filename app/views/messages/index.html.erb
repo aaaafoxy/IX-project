@@ -1,0 +1,28 @@
+<h2>消息中心</h2>
+<table class="list">
+  <thead>
+    <tr>
+      <th>内容</th>
+      <th>时间</th>
+      <th>状态</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @notifications.each do |msg| %>
+      <tr style="<%= 'font-weight:bold;' unless msg.read %>">
+        <td><%= msg.content %></td>
+        <td><%= msg.created_at.strftime('%Y-%m-%d %H:%M') %></td>
+        <td><%= msg.read ? '已读' : '未读' %></td>
+        <td>
+          <% if !msg.read %>
+            <%= link_to '标为已读', mark_as_read_notification_path(msg), method: :patch, remote: true %>
+          <% end %>
+          <% if msg.link.present? %>
+            <%= link_to '查看详情', msg.link, target: '_blank' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

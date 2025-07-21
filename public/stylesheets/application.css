@@ -32,12 +32,16 @@ pre, code {font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace;}
   padding: 8px 20px 0px 20px;
 }
 #top-menu ul {margin: 0;  padding: 0;}
-#top-menu li {
+#top-menu ul li {
   float:left;
   list-style-type:none;
   margin: 0px 0px 0px 0px;
   padding: 0px 0px 0px 0px;
   white-space:nowrap;
+  margin-left: 24px !important;
+}
+#top-menu ul li:first-child {
+  margin-left: 0 !important;
 }
 #top-menu a {
   color: #fff;

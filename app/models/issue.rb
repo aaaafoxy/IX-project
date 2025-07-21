@@ -120,7 +120,8 @@ class Issue < ActiveRecord::Base
     end
   end
   after_save :reschedule_following_issues, :update_nested_set_attributes,
-             :update_parent_attributes, :delete_selected_attachments, :create_journal
+             :update_parent_attributes, :delete_selected_attachments, :create_journal,
+             :create_assignment_notification
   # Should be after_create but would be called before previous after_save callbacks
   after_save :after_create_from_copy, :create_parent_issue_journal
   after_destroy :update_parent_attributes, :create_parent_issue_journal
@@ -2066,5 +2067,21 @@ class Issue < ActiveRecord::Base
   def editable_by_multi_assignee?(user)
     return true if user.admin? || (project && user.allowed_to?(:manage_issues, project))
     assignees.include?(user)
+  end
+
+  private
+
+  def create_assignment_notification
+    if saved_change_to_assigned_to_id? && assigned_to_id.present?
+      user = User.find_by(id: assigned_to_id)
+      if user
+        user.notifications.create!(
+          message_type: 'issue_assigned',
+          content: "你被指派了新的问题：#{self.subject}",
+          link: "/issues/#{self.id}",
+          read: false
+        )
+      end
+    end
   end
 end

@@ -68,6 +68,7 @@
 </div>
 
 <% is_worklog_tab = (controller.controller_name == 'worklogs' && ['new', 'history', 'create'].include?(controller.action_name)) %>
+<% is_notifications_page = controller.controller_name == 'notifications' %>
 
 <div id="header" style="position:relative;">
   <a href="#" class="mobile-toggle-button js-flyout-menu-toggle-button"></a>
@@ -87,7 +88,7 @@
         <li><a href="<%= history_worklogs_path %>" class="<%= controller.action_name == 'history' ? 'selected' : '' %>">填报历史</a></li>
       </ul>
     </div>
-  <% elsif display_main_menu?(@project) %>
+  <% elsif display_main_menu?(@project) && !is_notifications_page %>
     <div id="main-menu" class="tabs">
         <%= render_main_menu(@project) %>
         <div class="tabs-buttons" style="display:none;">

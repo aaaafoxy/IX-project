@@ -1,0 +1,22 @@
+<h2>消息详情</h2>
+<table class="list notifications-detail">
+  <tr>
+    <th>内容</th>
+    <td><%= @notification.content %></td>
+  </tr>
+  <tr>
+    <th>状态</th>
+    <td><%= @notification.read ? '已读' : '未读' %></td>
+  </tr>
+  <tr>
+    <th>时间</th>
+    <td><%= format_time(@notification.created_at) %></td>
+  </tr>
+  <% if @notification.link.present? %>
+    <tr>
+      <th>相关链接</th>
+      <td><%= link_to '查看相关内容', @notification.link %></td>
+    </tr>
+  <% end %>
+</table>
+<p><%= link_to '返回消息中心', notifications_path, class: 'icon icon-back' %></p> 

@@ -421,4 +421,13 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  resources :notifications, only: [:index, :show, :update] do
+    member do
+      patch :mark_as_read
+    end
+    collection do
+      get :unread_count
+    end
+  end
 end

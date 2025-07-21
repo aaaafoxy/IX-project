@@ -1,0 +1,33 @@
+<h2>消息中心</h2>
+<div class="tabs">
+  <ul>
+    <li class="<%= params[:tab] != 'read' ? 'selected' : '' %>"><%= link_to '未读', notifications_path(tab: nil) %></li>
+    <li class="<%= params[:tab] == 'read' ? 'selected' : '' %>"><%= link_to '已读', notifications_path(tab: 'read') %></li>
+  </ul>
+</div>
+<table class="list notifications-list">
+  <thead>
+    <tr>
+      <th>内容</th>
+      <th>状态</th>
+      <th>时间</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% filtered = params[:tab] == 'read' ? @notifications.select(&:read) : @notifications.reject(&:read) %>
+    <% filtered.each do |notification| %>
+      <tr class="<%= 'unread' unless notification.read %>">
+        <td><%= notification.content %></td>
+        <td><%= notification.read ? '已读' : '未读' %></td>
+        <td><%= format_time(notification.created_at) %></td>
+        <td>
+          <% unless notification.read %>
+            <%= link_to '标为已读', mark_as_read_notification_path(notification), method: :patch, remote: true, class: 'icon icon-checked' %>
+          <% end %>
+          <%= link_to '详情', notification_path(notification) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table> 

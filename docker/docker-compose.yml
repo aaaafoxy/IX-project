@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: redmine
+      MYSQL_DATABASE: redmine
+      MYSQL_USER: redmine
+      MYSQL_PASSWORD: redmine
+      TZ: Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ../data/mysql:/var/lib/mysql
+
+  redmine:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - db
+    environment:
+      RAILS_ENV: production
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: redmine
+      REDMINE_DB_ENCODING: utf8mb4
+      TZ: Asia/Shanghai
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../:/app
+      - ../data/files:/app/files
+      - ../data/log:/app/log
+      - ../data/tmp:/app/tmp
+      - ../data/plugin_assets:/app/public/plugin_assets
+    restart: always
