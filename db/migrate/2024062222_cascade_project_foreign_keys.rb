@@ -38,22 +38,33 @@ class CascadeProjectForeignKeys < ActiveRecord::Migration[6.1]
   end
 
   def down
-    remove_foreign_key :issues, :projects
-    add_foreign_key :issues, :projects
+    # 恢复原有的外键约束（不设置级联删除）
+    if foreign_key_exists?(:issues, :projects)
+      remove_foreign_key :issues, :projects
+      add_foreign_key :issues, :projects
+    end
 
-    remove_foreign_key :time_entries, :projects
-    add_foreign_key :time_entries, :projects
+    if foreign_key_exists?(:time_entries, :projects)
+      remove_foreign_key :time_entries, :projects
+      add_foreign_key :time_entries, :projects
+    end
 
-    remove_foreign_key :members, :projects
-    add_foreign_key :members, :projects
+    if foreign_key_exists?(:members, :projects)
+      remove_foreign_key :members, :projects
+      add_foreign_key :members, :projects
+    end
 
-    remove_foreign_key :documents, :projects
-    add_foreign_key :documents, :projects
+    if foreign_key_exists?(:documents, :projects)
+      remove_foreign_key :documents, :projects
+      add_foreign_key :documents, :projects
+    end
 
-    remove_foreign_key :news, :projects
-    add_foreign_key :news, :projects
+    if foreign_key_exists?(:news, :projects)
+      remove_foreign_key :news, :projects
+      add_foreign_key :news, :projects
+    end
 
-    if table_exists?(:worklogs)
+    if table_exists?(:worklogs) && foreign_key_exists?(:worklogs, :projects)
       remove_foreign_key :worklogs, :projects
       add_foreign_key :worklogs, :projects
     end

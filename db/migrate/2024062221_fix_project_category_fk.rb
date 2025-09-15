@@ -9,7 +9,10 @@ class FixProjectCategoryFk < ActiveRecord::Migration[6.1]
   end
 
   def down
-    remove_foreign_key :projects, column: :project_category_id
-    add_foreign_key :projects, :enumerations, column: :project_category_id
+    # 恢复原有的外键约束
+    if foreign_key_exists?(:projects, :enumerations, column: :project_category_id)
+      remove_foreign_key :projects, column: :project_category_id
+      add_foreign_key :projects, :enumerations, column: :project_category_id
+    end
   end
 end 
