@@ -16,7 +16,14 @@ gem "bigdecimal"
 gem "mutex_m"
 
 gem 'bundler', '>= 1.12.0'
+# Gemfile 添加以下内容
+gem 'pg', '~> 1.2.2'  # PostgreSQL适配器
+gem 'redis', '~> 4.0'  # Redis缓存
 
+# 如果使用Ruby 3.2+，添加以下gem解决兼容性问题
+gem 'logger', '~> 1.4'  # 解决Logger问题
+gem 'benchmark', '~> 0.1'  # 解决benchmark问题
+gem 'fiddle', '~> 1.0'  # 解决fiddle问题
 gem 'globalid', '~> 0.4.2' if Gem.ruby_version < Gem::Version.new('2.6.0')
 gem 'rouge', '~> 3.28.0'
 gem 'request_store', '~> 1.5.0'

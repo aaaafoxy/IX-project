@@ -14,6 +14,8 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
 
+  config.log_level = :info
+
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
@@ -34,13 +36,17 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = true
 
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
+  
+# 配置Redis缓存
+config.cache_store = :redis_cache_store, { url: 'redis://localhost:6379/0' }
+config.session_store = :redis_store, { servers: 'redis://localhost:6379/1' }
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :log
